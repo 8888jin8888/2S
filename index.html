@@ -3,285 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>專業庫存安全系統 - v7.0</title>
+    <title>專業庫存安全系統 v8.0</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --success: #27ae60; --danger: #e74c3c; --warning: #f39c12; }
+        :root { --primary: #2c3e50; --accent: #3498db; --success: #27ae60; --danger: #e74c3c; }
         body { font-family: "Microsoft JhengHei", sans-serif; background: #f4f7f6; margin: 0; padding: 0; }
-        nav { background: var(--primary); color: white; display: flex; justify-content: center; padding: 15px; gap: 8px; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
-        nav button { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 10px 15px; cursor: pointer; border-radius: 5px; }
-        nav button.active { background: var(--accent); border-color: var(--accent); font-weight: bold; }
-        .container { max-width: 1100px; margin: 20px auto; padding: 20px; }
-        .page { display: none; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        nav { background: var(--primary); color: white; display: flex; justify-content: center; padding: 10px; gap: 5px; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
+        nav button { background: rgba(255,255,255,0.1); border: none; color: white; padding: 10px; cursor: pointer; border-radius: 5px; font-size: 0.9rem; }
+        nav button.active { background: var(--accent); font-weight: bold; }
+        .container { max-width: 1000px; margin: 15px auto; padding: 15px; }
+        .page { display: none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .page.active { display: block; }
-        .sync-status { text-align: center; font-size: 12px; padding: 5px; background: #eee; color: #666; }
-        .input-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; flex: 1; min-width: 150px; }
-        button.btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; }
+        .sync-status { text-align: center; font-size: 11px; padding: 5px; background: #eee; color: #666; }
+        .input-group { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; flex: 1; min-width: 120px; }
+        button.btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; }
         .btn-add { background: var(--success); }
         .btn-action { background: var(--accent); }
-        .btn-del { background: var(--danger); }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; }
-        .reason-tag { color: #888; font-style: italic; font-size: 0.85rem; }
-        .diff-pos { color: var(--success); font-weight: bold; }
-        .diff-neg { color: var(--danger); font-weight: bold; }
-        /* 鎖定遮罩 */
+        .btn-del { background: var(--danger); font-size: 0.8rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+        th, td { border-bottom: 1px solid #eee; padding: 10px; text-align: left; }
+        .reason-tag { color: #888; font-style: italic; font-size: 0.8rem; }
         #authOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; }
     </style>
 </head>
 <body>
 
 <div id="authOverlay">
-    <h2>請輸入系統金鑰以存取</h2>
-    <input type="password" id="sysKeyInput" style="flex:none; width: 200px; margin-bottom: 15px;" placeholder="輸入金鑰...">
-    <button class="btn btn-action" onclick="initSystem()">解鎖系統</button>
+    <h2>🔒 系統鎖定</h2>
+    <input type="password" id="sysKeyInput" style="flex:none; width: 180px; margin-bottom: 15px; text-align: center;" placeholder="輸入金鑰">
+    <button class="btn btn-action" onclick="initSystem()">解鎖進入</button>
 </div>
 
-<div class="sync-status" id="syncLabel">雲端狀態：等待解鎖</div>
+<div class="sync-status" id="syncLabel">狀態：等待解鎖</div>
 
 <nav>
-    <button onclick="showPage('p1')" id="btn-p1" class="active">📦 建檔</button>
-    <button onclick="showPage('p2')" id="btn-p2">📊 總表</button>
-    <button onclick="showPage('p3')" id="btn-p3">📤 外借/歸還</button>
-    <button onclick="showPage('p4')" id="btn-p4">🔍 盤點修正</button>
-    <button onclick="showPage('p5')" id="btn-p5">📜 歷史紀錄</button>
+    <button onclick="showPage('p1')" id="btn-p1" class="active">🆕 建檔</button>
+    <button onclick="showPage('p2')" id="btn-p2">📋 總表</button>
+    <button onclick="showPage('p3')" id="btn-p3">🤝 外借</button>
+    <button onclick="showPage('p4')" id="btn-p4">🔧 盤點</button>
+    <button onclick="showPage('p5')" id="btn-p5">📜 紀錄</button>
 </nav>
 
 <div class="container">
     <div id="p1" class="page active">
-        <h2>商品建檔管理</h2>
+        <h3>新增品項</h3>
         <div class="input-group">
             <input type="text" id="pName" placeholder="名稱">
             <input type="number" id="pQty" placeholder="數量">
             <input type="text" id="pNote" placeholder="備註">
             <button class="btn btn-add" onclick="addProduct()">確認新增</button>
         </div>
-        <table id="setupTable"><thead><tr><th>名稱</th><th>總庫存</th><th>備註</th><th>管理</th></tr></thead><tbody></tbody></table>
+        <table id="setupTable"><thead><tr><th>名稱</th><th>庫存</th><th>管理</th></tr></thead><tbody></tbody></table>
     </div>
 
     <div id="p2" class="page">
-        <h2>庫存總表</h2>
-        <input type="text" id="searchInput" class="search-bar" placeholder="🔍 搜尋..." onkeyup="renderAll()">
-        <table id="fullTable"><thead><tr><th>名稱</th><th>總數/可用</th><th>狀態</th><th>備註</th><th>最後盤點</th></tr></thead><tbody></tbody></table>
+        <h3>庫存總表</h3>
+        <table id="fullTable"><thead><tr><th>名稱</th><th>數量(總/剩)</th><th>備註</th><th>最後更新</th></tr></thead><tbody></tbody></table>
     </div>
 
     <div id="p3" class="page">
-        <h2>外借管理</h2>
-        <div class="input-group"><select id="loanProductSelect"></select><input type="text" id="loanUser" placeholder="借用人"><button class="btn btn-action" onclick="createLoan()">執行</button></div>
-        <table id="loanTable"><thead><tr><th>借用人</th><th>物品</th><th>操作</th></tr></thead><tbody></tbody></table>
+        <h3>外借/歸還管理</h3>
+        <div class="input-group">
+            <select id="loanProductSelect"></select>
+            <input type="text" id="loanUser" placeholder="借用人">
+            <button class="btn btn-action" onclick="createLoan()">借出</button>
+        </div>
+        <table id="loanTable"><thead><tr><th>借用人</th><th>物品</th><th>管理</th></tr></thead><tbody></tbody></table>
     </div>
 
     <div id="p4" class="page">
-        <h2>年度盤點</h2>
-        <table id="stocktakeTable"><thead><tr><th>名稱</th><th>帳面數</th><th>上次盤點</th><th>操作</th></tr></thead><tbody></tbody></table>
+        <h3>年度盤點修正</h3>
+        <table id="stocktakeTable"><thead><tr><th>名稱</th><th>帳面數</th><th>操作</th></tr></thead><tbody></tbody></table>
     </div>
 
     <div id="p5" class="page">
-        <h2>盤點歷史紀錄 (含修正事由)</h2>
-        <table id="historyTable"><thead><tr><th>變動時間</th><th>品項</th><th>變動</th><th>原因/事由</th></tr></thead><tbody></tbody></table>
+        <h3>歷史紀錄 (含修正事由)</h3>
+        <table id="historyTable"><thead><tr><th>時間</th><th>品項</th><th>變動</th><th>原因</th></tr></thead><tbody></tbody></table>
     </div>
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwei6lRay6e5RXLHPefnEHsOBLJ1KN7PuD203V4OiBWrmD_kAIWUoy4whlClkGb9wdh1w/exec"; 
+    // ⚠️ 請修改此處為你的 GAS 部署網址
+    const API_URL = "https://script.google.com/macros/s/AKfycbzjKvG59WS7-MIAg_t9CcyxsqnD5w1pTH0NMxYk2WX_84yatk0q2j8ghBMEk-q4YC5E/exec"; 
     let sysKey = "";
     let products = [], loans = [], history = [];
 
     function initSystem() {
         sysKey = document.getElementById('sysKeyInput').value;
-        if(!sysKey) return alert("請輸入金鑰");
-        document.getElementById('authOverlay').style.display = 'none';
-        syncFromCloud();
+        if(sysKey === "1225") {
+            document.getElementById('authOverlay').style.display = 'none';
+            syncFromCloud();
+        } else {
+            alert("金鑰錯誤！");
+        }
     }
 
     async function syncFromCloud() {
-        document.getElementById('syncLabel').innerText = "雲端狀態：同步中...";
+        document.getElementById('syncLabel').innerText = "狀態：雲端同步中...";
         try {
-            const response = await fetch(`${API_URL}?key=${sysKey}`);
-            const data = await response.json();
-            if (data.error) {
-                alert("金鑰錯誤，請重新整理頁面");
-                location.reload();
-            } else {
-                products = data.products || [];
-                loans = data.loans || [];
-                history = data.history || [];
-                renderAll();
-                document.getElementById('syncLabel').innerText = "雲端狀態：已同步";
-            }
+            const res = await fetch(`${API_URL}?key=${sysKey}`);
+            const data = await res.json();
+            products = data.products || [];
+            loans = data.loans || [];
+            history = data.history || [];
+            renderAll();
+            document.getElementById('syncLabel').innerText = "狀態：已與雲端同步";
         } catch (e) {
-            document.getElementById('syncLabel').innerText = "雲端狀態：連線失敗";
+            document.getElementById('syncLabel').innerText = "狀態：連線失敗，請檢查網路";
         }
     }
 
-   async function save() {
-    document.getElementById('syncLabel').innerText = "雲端狀態：正在儲存...";
-    const payload = {
-        key: sysKey,
-        data: { 
-            products: products, 
-            loans: loans, 
-            history: history 
+    async function save() {
+        document.getElementById('syncLabel').innerText = "狀態：正在儲存至雲端...";
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ key: sysKey, data: { products, loans, history } })
+            });
+            document.getElementById('syncLabel').innerText = "狀態：儲存成功";
+        } catch (e) {
+            document.getElementById('syncLabel').innerText = "狀態：儲存失敗";
         }
-    };
-
-    try {
-        await fetch(API_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(payload)
-        });
-        document.getElementById('syncLabel').innerText = "雲端狀態：儲存成功";
-        // 本地同步更新一份，防止斷網
-        localStorage.setItem('cloud_inv_full_backup', JSON.stringify(payload.data));
-    } catch (e) {
-        document.getElementById('syncLabel').innerText = "雲端狀態：儲存失敗";
+        renderAll();
     }
-    renderAll();
-}
 
-    // 盤點修正 (新增事由功能)
+    function renderAll() {
+        // 建檔表格
+        const sBody = document.querySelector("#setupTable tbody");
+        if(sBody) sBody.innerHTML = products.map(p => `<tr><td>${p.name}</td><td>${p.total}</td><td><button class="btn btn-del" onclick="deleteProduct(${p.id})">刪除</button></td></tr>`).join('');
+
+        // 總表表格
+        const fBody = document.querySelector("#fullTable tbody");
+        if(fBody) fBody.innerHTML = products.map(p => `<tr><td>${p.name}</td><td>${p.total} / ${p.available}</td><td>${p.note || ''}</td><td>${p.lastDate || '---'}</td></tr>`).join('');
+
+        // 外借表格
+        const lBody = document.querySelector("#loanTable tbody");
+        if(lBody) lBody.innerHTML = loans.map(l => `<tr><td>${l.user}</td><td>${l.pname}</td><td><button class="btn btn-action" onclick="returnItem(${l.id})">歸還</button></td></tr>`).join('');
+
+        // 盤點表格
+        const tBody = document.querySelector("#stocktakeTable tbody");
+        if(tBody) tBody.innerHTML = products.map(p => `<tr><td>${p.name}</td><td>${p.total}</td><td><button class="btn btn-action" onclick="adjust(${p.id})">修正</button></td></tr>`).join('');
+
+        // 紀錄表格
+        const hBody = document.querySelector("#historyTable tbody");
+        if(hBody) hBody.innerHTML = history.map(h => `<tr><td>${h.time}</td><td>${h.name}</td><td>${h.old}→${h.new}</td><td class="reason-tag">${h.reason}</td></tr>`).join('');
+
+        // 選單
+        const sel = document.getElementById('loanProductSelect');
+        if(sel) sel.innerHTML = products.map(p => `<option value="${p.id}">${p.name} (剩:${p.available})</option>`).join('');
+    }
+
+    function addProduct() {
+        const name = document.getElementById('pName').value.trim();
+        const qty = parseInt(document.getElementById('pQty').value);
+        if(!name || isNaN(qty)) return alert("請輸入完整資料");
+        products.push({ id: Date.now(), name, total: qty, available: qty, note: document.getElementById('pNote').value, lastDate: '---' });
+        save();
+        document.getElementById('pName').value = ''; document.getElementById('pQty').value = ''; document.getElementById('pNote').value = '';
+    }
+
+    function deleteProduct(id) {
+        if(confirm("確定刪除？")) { products = products.filter(p => p.id !== id); save(); }
+    }
+
+    function createLoan() {
+        const pid = document.getElementById('loanProductSelect').value;
+        const user = document.getElementById('loanUser').value.trim();
+        const p = products.find(i => i.id == pid);
+        if(p && p.available > 0 && user) {
+            p.available--;
+            loans.push({ id: Date.now(), pid: p.id, pname: p.name, user });
+            save();
+            document.getElementById('loanUser').value = '';
+        }
+    }
+
+    function returnItem(lid) {
+        const l = loans.find(i => i.id == lid);
+        const p = products.find(i => i.id == l.pid);
+        if(p) p.available++;
+        loans = loans.filter(i => i.id !== lid);
+        save();
+    }
+
     function adjust(id) {
-        const newVal = prompt("請輸入實盤總數量：");
-        if(newVal !== null && newVal !== "") {
-            const reason = prompt("請輸入修正事由 (例如：損壞、漏登、年度盤點)：") || "未註明事由";
-            const product = products.find(p => p.id == id);
-            const oldQty = product.total;
-            const newQty = parseInt(newVal);
-            const diff = newQty - oldQty;
-            const now = new Date().toLocaleString();
-
-            history.unshift({ time: now, name: product.name, old: oldQty, new: newQty, diff: diff, reason: reason });
-            product.total = newQty;
-            product.available = newQty; 
-            product.lastDate = now.split(' ')[0];
+        const newVal = prompt("實際數量：");
+        if(newVal !== null) {
+            const reason = prompt("修正事由：") || "盤點修正";
+            const p = products.find(i => i.id == id);
+            const now = new Date().toLocaleString('zh-TW', {hour12:false}).slice(5,16);
+            history.unshift({ time: now, name: p.name, old: p.total, new: parseInt(newVal), reason: reason });
+            p.total = parseInt(newVal); p.available = parseInt(newVal); p.lastDate = now;
             save();
         }
     }
 
-    // 其餘原本的 addProduct, createLoan, returnItem, renderAll 函數保持不變...
-    // (因字數限制，請沿用 v6.0 的渲染邏輯，但在渲染歷史紀錄時加入 h.reason)
-    
-  function renderAll() {
-    // 1. 渲染建檔頁面表格 (新增後會立刻顯示在這裡)
-    const setupBody = document.querySelector("#setupTable tbody");
-    if (setupBody) {
-        setupBody.innerHTML = products.map(p => `
-            <tr>
-                <td>${p.name}</td>
-                <td>${p.total}</td>
-                <td>${p.note || ''}</td>
-                <td><button class="btn btn-del" onclick="deleteProduct(${p.id})">刪除</button></td>
-            </tr>
-        `).join('');
-    }
-
-    // 2. 渲染總表
-    const fullBody = document.querySelector("#fullTable tbody");
-    if (fullBody) {
-        fullBody.innerHTML = products.map(p => `
-            <tr>
-                <td>${p.name}</td>
-                <td>${p.total} / ${p.available}</td>
-                <td>${p.available > 0 ? '✅ 有庫存' : '❌ 已借光'}</td>
-                <td>${p.note || ''}</td>
-                <td>${p.lastDate || '---'}</td>
-            </tr>
-        `).join('');
-    }
-
-    // 3. 渲染盤點頁面
-    const stockBody = document.querySelector("#stocktakeTable tbody");
-    if (stockBody) {
-        stockBody.innerHTML = products.map(p => `
-            <tr>
-                <td>${p.name}</td>
-                <td>${p.total}</td>
-                <td>${p.lastDate || '---'}</td>
-                <td><button class="btn btn-action" onclick="adjust(${p.id})">修正數量</button></td>
-            </tr>
-        `).join('');
-    }
-
-    // 4. 渲染歷史紀錄 (加上事由)
-    const historyBody = document.querySelector("#historyTable tbody");
-    if (historyBody) {
-        historyBody.innerHTML = history.map(h => `
-            <tr>
-                <td style="font-size:0.8rem">${h.time}</td>
-                <td>${h.name}</td>
-                <td class="${h.diff > 0 ? 'diff-pos' : 'diff-neg'}">${h.old} → ${h.new} (${h.diff > 0 ? '+' + h.diff : h.diff})</td>
-                <td class="reason-tag">${h.reason || '無'}</td>
-            </tr>
-        `).join('');
-    }
-
-    // 5. 更新外借下拉選單
-    const select = document.getElementById('loanProductSelect');
-    if (select) {
-        select.innerHTML = products.map(p => `<option value="${p.id}">${p.name} (剩餘:${p.available})</option>`).join('');
-    }
-}
-
-// 補上刪除功能，否則 renderAll 會因為找不到 deleteProduct 而報錯
-function deleteProduct(id) {
-    if (confirm("確定要刪除此品項嗎？相關紀錄將一併移除。")) {
-        products = products.filter(p => p.id !== id);
-        save();
-    }
-}
-    // (請補上 v6.0 的基礎功能函數)
     function showPage(id) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.getElementById('btn-' + id).classList.add('active');
-        renderAll();
-    }
-    function addProduct() {
-    const name = document.getElementById('pName').value;
-    const qty = parseInt(document.getElementById('pQty').value);
-    const note = document.getElementById('pNote').value;
-    
-    if(!name || isNaN(qty)) return alert("請輸入完整資料");
-
-    const newProduct = { 
-        id: Date.now(), 
-        name: name, 
-        total: qty, 
-        available: qty, 
-        note: note, 
-        lastDate: '---' 
-    };
-
-    products.push(newProduct);
-    save(); // 呼叫存檔
-    
-    // 清空輸入框
-    document.getElementById('pName').value = ''; 
-    document.getElementById('pQty').value = ''; 
-    document.getElementById('pNote').value = '';
-}
-    function createLoan() {
-        const pid = document.getElementById('loanProductSelect').value;
-        const user = document.getElementById('loanUser').value;
-        const product = products.find(p => p.id == pid);
-        if(product && product.available > 0 && user) {
-            product.available--;
-            loans.push({ id: Date.now(), pid: product.id, pname: product.name, user });
-            save();
-            document.getElementById('loanUser').value = '';
-        }
-    }
-    function returnItem(lid) {
-        const loan = loans.find(l => l.id == lid);
-        const product = products.find(p => p.id == loan.pid);
-        if(product) product.available++;
-        loans = loans.filter(l => l.id !== lid);
-        save();
     }
 </script>
 </body>
 </html>
-
-

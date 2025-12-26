@@ -162,19 +162,74 @@
     // 其餘原本的 addProduct, createLoan, returnItem, renderAll 函數保持不變...
     // (因字數限制，請沿用 v6.0 的渲染邏輯，但在渲染歷史紀錄時加入 h.reason)
     
-    function renderAll() {
-        // ... (省略部分重複渲染邏輯)
-        document.querySelector("#historyTable tbody").innerHTML = history.map(h => `
+  function renderAll() {
+    // 1. 渲染建檔頁面表格 (新增後會立刻顯示在這裡)
+    const setupBody = document.querySelector("#setupTable tbody");
+    if (setupBody) {
+        setupBody.innerHTML = products.map(p => `
             <tr>
-                <td class="date-tag">${h.time}</td>
-                <td>${h.name}</td>
-                <td class="${h.diff > 0 ? 'diff-pos' : 'diff-neg'}">${h.old} → ${h.new} (${h.diff > 0 ? '+' + h.diff : h.diff})</td>
-                <td class="reason-tag">${h.reason}</td>
+                <td>${p.name}</td>
+                <td>${p.total}</td>
+                <td>${p.note || ''}</td>
+                <td><button class="btn btn-del" onclick="deleteProduct(${p.id})">刪除</button></td>
             </tr>
         `).join('');
-        // ... (其餘渲染邏輯)
     }
-    
+
+    // 2. 渲染總表
+    const fullBody = document.querySelector("#fullTable tbody");
+    if (fullBody) {
+        fullBody.innerHTML = products.map(p => `
+            <tr>
+                <td>${p.name}</td>
+                <td>${p.total} / ${p.available}</td>
+                <td>${p.available > 0 ? '✅ 有庫存' : '❌ 已借光'}</td>
+                <td>${p.note || ''}</td>
+                <td>${p.lastDate || '---'}</td>
+            </tr>
+        `).join('');
+    }
+
+    // 3. 渲染盤點頁面
+    const stockBody = document.querySelector("#stocktakeTable tbody");
+    if (stockBody) {
+        stockBody.innerHTML = products.map(p => `
+            <tr>
+                <td>${p.name}</td>
+                <td>${p.total}</td>
+                <td>${p.lastDate || '---'}</td>
+                <td><button class="btn btn-action" onclick="adjust(${p.id})">修正數量</button></td>
+            </tr>
+        `).join('');
+    }
+
+    // 4. 渲染歷史紀錄 (加上事由)
+    const historyBody = document.querySelector("#historyTable tbody");
+    if (historyBody) {
+        historyBody.innerHTML = history.map(h => `
+            <tr>
+                <td style="font-size:0.8rem">${h.time}</td>
+                <td>${h.name}</td>
+                <td class="${h.diff > 0 ? 'diff-pos' : 'diff-neg'}">${h.old} → ${h.new} (${h.diff > 0 ? '+' + h.diff : h.diff})</td>
+                <td class="reason-tag">${h.reason || '無'}</td>
+            </tr>
+        `).join('');
+    }
+
+    // 5. 更新外借下拉選單
+    const select = document.getElementById('loanProductSelect');
+    if (select) {
+        select.innerHTML = products.map(p => `<option value="${p.id}">${p.name} (剩餘:${p.available})</option>`).join('');
+    }
+}
+
+// 補上刪除功能，否則 renderAll 會因為找不到 deleteProduct 而報錯
+function deleteProduct(id) {
+    if (confirm("確定要刪除此品項嗎？相關紀錄將一併移除。")) {
+        products = products.filter(p => p.id !== id);
+        save();
+    }
+}
     // (請補上 v6.0 的基礎功能函數)
     function showPage(id) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -228,4 +283,5 @@
 </script>
 </body>
 </html>
+
 

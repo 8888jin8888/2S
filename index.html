@@ -114,20 +114,31 @@
         }
     }
 
-    async function save() {
-        document.getElementById('syncLabel').innerText = "雲端狀態：正在儲存...";
-        try {
-            await fetch(API_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ key: sysKey, data: { products, loans, history } })
-            });
-            document.getElementById('syncLabel').innerText = "雲端狀態：儲存成功";
-        } catch (e) {
-            document.getElementById('syncLabel').innerText = "雲端狀態：儲存失敗";
+   async function save() {
+    document.getElementById('syncLabel').innerText = "雲端狀態：正在儲存...";
+    const payload = {
+        key: sysKey,
+        data: { 
+            products: products, 
+            loans: loans, 
+            history: history 
         }
-        renderAll();
+    };
+
+    try {
+        await fetch(API_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(payload)
+        });
+        document.getElementById('syncLabel').innerText = "雲端狀態：儲存成功";
+        // 本地同步更新一份，防止斷網
+        localStorage.setItem('cloud_inv_full_backup', JSON.stringify(payload.data));
+    } catch (e) {
+        document.getElementById('syncLabel').innerText = "雲端狀態：儲存失敗";
     }
+    renderAll();
+}
 
     // 盤點修正 (新增事由功能)
     function adjust(id) {
@@ -173,14 +184,29 @@
         renderAll();
     }
     function addProduct() {
-        const name = document.getElementById('pName').value;
-        const qty = parseInt(document.getElementById('pQty').value);
-        const note = document.getElementById('pNote').value;
-        if(!name || isNaN(qty)) return alert("請輸入完整資料");
-        products.push({ id: Date.now(), name, total: qty, available: qty, note, lastDate: '---' });
-        save();
-        document.getElementById('pName').value = ''; document.getElementById('pQty').value = ''; document.getElementById('pNote').value = '';
-    }
+    const name = document.getElementById('pName').value;
+    const qty = parseInt(document.getElementById('pQty').value);
+    const note = document.getElementById('pNote').value;
+    
+    if(!name || isNaN(qty)) return alert("請輸入完整資料");
+
+    const newProduct = { 
+        id: Date.now(), 
+        name: name, 
+        total: qty, 
+        available: qty, 
+        note: note, 
+        lastDate: '---' 
+    };
+
+    products.push(newProduct);
+    save(); // 呼叫存檔
+    
+    // 清空輸入框
+    document.getElementById('pName').value = ''; 
+    document.getElementById('pQty').value = ''; 
+    document.getElementById('pNote').value = '';
+}
     function createLoan() {
         const pid = document.getElementById('loanProductSelect').value;
         const user = document.getElementById('loanUser').value;
@@ -202,3 +228,4 @@
 </script>
 </body>
 </html>
+
